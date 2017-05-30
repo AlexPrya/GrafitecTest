@@ -5,6 +5,9 @@ error () {
     notNum)
         echo "Error: $1 is not a number!"
     ;;
+    notProgression)
+        echo "Error: $1 is not arithmetic progression"
+    ;;
     esac
 
     exit 1
@@ -14,16 +17,37 @@ echo "Введите числовую последовательность че�
 read numbers	#Вводим числовую последовательность
 
 vals=(${numbers//,/ })
+firstArg=
+difference=
 
-for val in "${vals[@]}"
+for((i=0;i<${#vals[@]};i++))
 do
-    if (($val+0))
+    let "curNum = ${vals[$i]}+0"
+   echo $curNum
+    if [[ $curNum -ge 0 ]]
     then
-        echo $val
-    else
-        error $val notNum
-    fi
 
+        if [[ "$i" > 1 ]]
+        then
+            dif=$difference
+            let "difference=${vals[$i]}-${vals[$i-1]}"
+
+            # если разности не равны, то это не арифметическая прогрессия
+            if [[ "$dif" -ne "$difference" ]]
+            then
+                error $numbers notProgression
+            fi
+
+        elif [[ $i -eq 1 ]]
+        then
+            let "difference=${vals[$i]}-${vals[$i-1]}"
+        fi
+
+    else
+        error "$vals[$i]" notNum
+    fi
 done
+
+echo "Yes! $numbers - is an arithmetic progression"
 
 exit 0
